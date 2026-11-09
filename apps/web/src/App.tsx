@@ -3,6 +3,12 @@ import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ComingSoonPage } from './pages/ComingSoon';
 import { LoginPage } from './pages/Login/LoginPage';
+import { ProductFormPage } from './pages/Products/ProductFormPage';
+import { ProductsPage } from './pages/Products/ProductsPage';
+import { NewSalePage } from './pages/Sales/NewSalePage';
+import { SaleDetailPage } from './pages/Sales/SaleDetailPage';
+import { SalesPage } from './pages/Sales/SalesPage';
+import { UsersPage } from './pages/Users/UsersPage';
 
 export function App() {
   return (
@@ -24,15 +30,17 @@ export function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/products" element={<ComingSoonPage title="Produtos" />} />
-        <Route path="/products/:id" element={<ComingSoonPage title="Produto" />} />
-        <Route path="/sales/new" element={<ComingSoonPage title="Nova venda" />} />
-        <Route path="/sales" element={<ComingSoonPage title="Vendas" />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/new" element={<ProductFormPage />} />
+        <Route path="/products/:id" element={<ProductFormPage />} />
+        <Route path="/sales/new" element={<NewSalePage />} />
+        <Route path="/sales" element={<SalesPage />} />
+        <Route path="/sales/:id" element={<SaleDetailPage />} />
         <Route
           path="/users"
           element={
             <ProtectedRoute roles={['ADMIN']}>
-              <ComingSoonPage title="Utilizadores" />
+              <UsersPage />
             </ProtectedRoute>
           }
         />
