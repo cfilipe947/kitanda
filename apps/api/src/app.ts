@@ -5,6 +5,8 @@ import { env } from './config/env.js';
 import { prisma } from './lib/prisma.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
+import { categoriesRoutes } from './modules/categories/categories.routes.js';
+import { productsRoutes } from './modules/products/products.routes.js';
 import { usersRoutes } from './modules/users/users.routes.js';
 
 export function createApp() {
@@ -27,8 +29,10 @@ export function createApp() {
 
   v1.use('/auth', authRoutes);
   v1.use('/users', usersRoutes);
+  v1.use('/categories', categoriesRoutes);
+  v1.use('/products', productsRoutes);
 
-  // Fases seguintes: v1.use('/products', productRoutes), v1.use('/sales', salesRoutes), ...
+  // Fase seguinte: v1.use('/sales', salesRoutes), v1.use('/reports', reportsRoutes)
 
   app.use('/api/v1', v1);
 
