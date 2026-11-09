@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import { env } from './config/env.js';
 import { prisma } from './lib/prisma.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { authRoutes } from './modules/auth/auth.routes.js';
+import { usersRoutes } from './modules/users/users.routes.js';
 
 export function createApp() {
   const app = express();
@@ -23,7 +25,10 @@ export function createApp() {
     }
   });
 
-  // Fases seguintes: v1.use('/auth', authRoutes), v1.use('/products', productRoutes), ...
+  v1.use('/auth', authRoutes);
+  v1.use('/users', usersRoutes);
+
+  // Fases seguintes: v1.use('/products', productRoutes), v1.use('/sales', salesRoutes), ...
 
   app.use('/api/v1', v1);
 

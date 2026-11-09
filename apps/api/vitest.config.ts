@@ -10,6 +10,10 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.test.ts'],
     setupFiles: ['./tests/setup.ts'],
+    // Todos os ficheiros de teste partilham a mesma BD de teste (sem isolamento por
+    // transacção/schema): correr em paralelo faz um ficheiro truncar tabelas a meio
+    // de outro.
+    fileParallelism: false,
     env: {
       NODE_ENV: 'test',
       JWT_SECRET: 'test-secret-com-pelo-menos-32-caracteres!!',

@@ -77,22 +77,28 @@ async function main() {
     });
   }
 
-  // Algumas vendas distribuídas pelos últimos 30 dias, reduzindo o stock recém-criado.
+  // Algumas vendas distribuídas pelos últimos 30 dias, reduzindo o stock recém-criado
+  // (nunca abaixo de zero: cada venda só escolhe produtos com stock restante).
   const paymentMethods = ['CASH', 'MULTICAIXA', 'TRANSFER'] as const;
   const now = Date.now();
   const DAY_MS = 24 * 60 * 60 * 1000;
+  const remainingStock = new Map(products.map((product) => [product.id, product.stockQuantity]));
 
   for (let i = 0; i < 15; i++) {
+    const available = products.filter((product) => (remainingStock.get(product.id) ?? 0) > 0);
+    if (available.length === 0) break;
+
     const daysAgo = Math.floor(Math.random() * 30);
     const createdAt = new Date(now - daysAgo * DAY_MS - Math.floor(Math.random() * DAY_MS));
-    const itemCount = 1 + Math.floor(Math.random() * 3);
+    const itemCount = Math.min(1 + Math.floor(Math.random() * 3), available.length);
 
-    const chosen = [...products].sort(() => Math.random() - 0.5).slice(0, itemCount);
-    const items = chosen.map((product) => ({
-      productId: product.id,
-      quantity: 1 + Math.floor(Math.random() * 2),
-      unitPriceCents: product.priceCents,
-    }));
+    const chosen = [...available].sort(() => Math.random() - 0.5).slice(0, itemCount);
+    const items = chosen.map((product) => {
+      const remaining = remainingStock.get(product.id) ?? 0;
+      const quantity = 1 + Math.floor(Math.random() * Math.min(2, remaining));
+      remainingStock.set(product.id, remaining - quantity);
+      return { productId: product.id, quantity, unitPriceCents: product.priceCents };
+    });
     const totalCents = items.reduce((sum, item) => sum + item.unitPriceCents * item.quantity, 0);
 
     await prisma.sale.create({
