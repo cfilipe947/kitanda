@@ -1,0 +1,18 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+apps/api/src/generated/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code
+.claude/
+CLAUDE.md
+**/CLAUDE.md
+docs/ROADMAP.md
+docs/SPEC.md

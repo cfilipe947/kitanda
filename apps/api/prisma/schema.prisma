@@ -1,0 +1,102 @@
+// Modelo de dados do Kitanda (ver docs/SPEC.md §3).
+// Fase 1: configurar com Prisma 7 (prisma.config.ts + @prisma/adapter-pg) e correr a primeira migração.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  CASHIER
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+enum PaymentMethod {
+  CASH
+  MULTICAIXA
+  TRANSFER
+}
+
+model User {
+  id           String          @id @default(uuid())
+  name         String
+  email        String          @unique
+  passwordHash String
+  role         Role            @default(CASHIER)
+  createdAt    DateTime        @default(now())
+  sales        Sale[]
+  movements    StockMovement[]
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Product {
+  id            String          @id @default(uuid())
+  name          String
+  sku           String          @unique
+  categoryId    String
+  category      Category        @relation(fields: [categoryId], references: [id])
+  priceCents    Int
+  costCents     Int             @default(0)
+  stockQuantity Int             @default(0)
+  minStock      Int             @default(5)
+  active        Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  movements     StockMovement[]
+  saleItems     SaleItem[]
+
+  @@index([name])
+  @@index([categoryId])
+}
+
+model StockMovement {
+  id        String       @id @default(uuid())
+  productId String
+  product   Product      @relation(fields: [productId], references: [id])
+  type      MovementType
+  quantity  Int
+  reason    String?
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  createdAt DateTime     @default(now())
+
+  @@index([productId, createdAt])
+}
+
+model Sale {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  totalCents    Int
+  paymentMethod PaymentMethod
+  createdAt     DateTime      @default(now())
+  items         SaleItem[]
+
+  @@index([createdAt])
+}
+
+model SaleItem {
+  id             String  @id @default(uuid())
+  saleId         String
+  sale           Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product @relation(fields: [productId], references: [id])
+  quantity       Int
+  unitPriceCents Int
+}
