@@ -74,3 +74,13 @@ export type Sale = {
 };
 
 export type SaleDetail = Sale & { items: SaleItem[] };
+
+export type ReportSummary = {
+  today: { totalCents: number; count: number };
+  month: { totalCents: number; count: number };
+  lowStockCount: number;
+};
+
+export type SalesByDayPoint = { day: string; totalCents: number; count: number };
+
+export type TopProduct = { productId: string; name: string; totalQuantity: number; totalCents: number };

@@ -3,10 +3,28 @@ import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import { renderWithProviders } from './test/renderWithProviders';
 
+function jsonResponse(status: number, body: unknown) {
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+}
+
 function mockFetchOnce(status: number, body: unknown) {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(status, body)));
+}
+
+// O Painel (ADMIN) dispara vários pedidos assim que monta: cada um precisa de uma
+// resposta com a forma certa, senão o componente rebenta a ler propriedades em falta.
+function mockFetchForDashboard(loginStatus: number, loginBody: unknown) {
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })),
+    vi.fn(async (url: string) => {
+      if (url.includes('/auth/login')) return jsonResponse(loginStatus, loginBody);
+      if (url.includes('/reports/summary')) {
+        return jsonResponse(200, { today: { totalCents: 0, count: 0 }, month: { totalCents: 0, count: 0 }, lowStockCount: 0 });
+      }
+      if (url.includes('/reports/')) return jsonResponse(200, { data: [] });
+      if (url.includes('/products')) return jsonResponse(200, { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+      return jsonResponse(404, { error: { code: 'NOT_FOUND', message: 'Não encontrado', details: [] } });
+    }),
   );
 }
 
@@ -20,7 +38,7 @@ describe('rotas protegidas', () => {
 
 describe('login', () => {
   it('login com sucesso leva um ADMIN para o Painel', async () => {
-    mockFetchOnce(200, {
+    mockFetchForDashboard(200, {
       token: 'token-falso',
       user: { id: '1', name: 'Admin', email: 'admin@kitanda.ao', role: 'ADMIN', createdAt: new Date().toISOString() },
     });

@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { ComingSoonPage } from './pages/ComingSoon';
+import { DashboardPage } from './pages/Dashboard/DashboardPage';
 import { LoginPage } from './pages/Login/LoginPage';
 import { ProductFormPage } from './pages/Products/ProductFormPage';
 import { ProductsPage } from './pages/Products/ProductsPage';
@@ -26,7 +26,7 @@ export function App() {
           path="/"
           element={
             <ProtectedRoute roles={['ADMIN']}>
-              <ComingSoonPage title="Painel" />
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
