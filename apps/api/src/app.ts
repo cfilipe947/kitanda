@@ -2,6 +2,8 @@ import cors from 'cors';
 import express, { Router } from 'express';
 import helmet from 'helmet';
 import { env } from './config/env.js';
+import { prisma } from './lib/prisma.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 export function createApp() {
   const app = express();
@@ -12,9 +14,13 @@ export function createApp() {
 
   const v1 = Router();
 
-  v1.get('/health', (_req, res) => {
-    // Fase 1: verificar também a ligação à base de dados.
-    res.json({ status: 'ok', uptime: process.uptime() });
+  v1.get('/health', async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({ status: 'ok', uptime: process.uptime() });
+    } catch {
+      res.status(503).json({ status: 'error', uptime: process.uptime() });
+    }
   });
 
   // Fases seguintes: v1.use('/auth', authRoutes), v1.use('/products', productRoutes), ...
@@ -22,14 +28,10 @@ export function createApp() {
   app.use('/api/v1', v1);
 
   app.use((_req, res) => {
-    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Rota não encontrada' } });
+    res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Rota não encontrada', details: [] } });
   });
 
-  // Fase 1: substituir por middlewares/errorHandler.ts
-  app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error(err);
-    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Erro interno do servidor' } });
-  });
+  app.use(errorHandler);
 
   return app;
 }
