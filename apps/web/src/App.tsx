@@ -1,12 +1,44 @@
-import { formatKz } from './lib/format';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { AppLayout } from './components/layout/AppLayout';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { ComingSoonPage } from './pages/ComingSoon';
+import { LoginPage } from './pages/Login/LoginPage';
 
-// Ecrã provisório. Fase 5: substituir pelas rotas da SPEC (login, painel, produtos, vendas...).
 export function App() {
   return (
-    <main style={{ fontFamily: 'system-ui', padding: 32 }}>
-      <h1>Kitanda</h1>
-      <p>Gestão de stock e vendas para pequenas lojas.</p>
-      <p>Exemplo de preço: {formatKz(150000)}</p>
-    </main>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+
+      <Route
+        element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <ComingSoonPage title="Painel" />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/products" element={<ComingSoonPage title="Produtos" />} />
+        <Route path="/products/:id" element={<ComingSoonPage title="Produto" />} />
+        <Route path="/sales/new" element={<ComingSoonPage title="Nova venda" />} />
+        <Route path="/sales" element={<ComingSoonPage title="Vendas" />} />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <ComingSoonPage title="Utilizadores" />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
