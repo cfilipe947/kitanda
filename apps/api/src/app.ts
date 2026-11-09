@@ -16,6 +16,14 @@ import { generateOpenApiDocument } from './openapi.js';
 export function createApp() {
   const app = express();
 
+  // Em produção (Render/Railway) a API fica atrás de um único proxy reverso: sem isto,
+  // o rate limit do login via a mesma IP para todos os pedidos (a do proxy, não a do
+  // cliente). Fora de produção não há proxy nenhum — confiar no header na mesma deixava
+  // qualquer cliente fingir a IP que quisesse via X-Forwarded-For.
+  if (env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+  }
+
   app.use(helmet());
   app.use(cors({ origin: env.CORS_ORIGIN }));
   app.use(express.json({ limit: '100kb' }));
