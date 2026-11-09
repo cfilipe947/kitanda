@@ -18,7 +18,9 @@ services:
       retries: 10
 
   api:
-    build: ./apps/api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     env_file: .env
     environment:
       DATABASE_URL: postgresql://kitanda:kitanda@db:5432/kitanda
@@ -28,7 +30,16 @@ services:
       db:
         condition: service_healthy
 
-  # O serviço "web" é adicionado na Fase 8.
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3333/api/v1
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
 
 volumes:
   pgdata:
