@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
-import { Loading } from '../../components/ui/Loading';
+import { SkeletonTableRows } from '../../components/ui/Skeleton';
 import { Table } from '../../components/ui/Table';
 import { useSales } from '../../hooks/useSales';
 import { formatKz } from '../../lib/format';
@@ -17,11 +17,11 @@ export function SalesPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold text-slate-900">Vendas</h1>
+      <h1 className="mb-6 font-heading text-3xl font-semibold text-neutral-900">Vendas</h1>
 
       <div className="mb-4 flex flex-wrap items-end gap-3">
         <div>
-          <label htmlFor="from" className="mb-1 block text-sm text-slate-700">
+          <label htmlFor="from" className="mb-1.5 block text-sm font-medium text-neutral-700">
             De
           </label>
           <input
@@ -32,11 +32,11 @@ export function SalesPage() {
               setFrom(event.target.value);
               setPage(1);
             }}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500"
           />
         </div>
         <div>
-          <label htmlFor="to" className="mb-1 block text-sm text-slate-700">
+          <label htmlFor="to" className="mb-1.5 block text-sm font-medium text-neutral-700">
             Até
           </label>
           <input
@@ -47,12 +47,12 @@ export function SalesPage() {
               setTo(event.target.value);
               setPage(1);
             }}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-neutral-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500"
           />
         </div>
       </div>
 
-      {salesQuery.isLoading && <Loading />}
+      {salesQuery.isLoading && <SkeletonTableRows columns={4} />}
       {salesQuery.isError && <ErrorState onRetry={() => salesQuery.refetch()} />}
       {salesQuery.data?.data.length === 0 && <EmptyState message="Nenhuma venda encontrada." />}
 
@@ -62,12 +62,12 @@ export function SalesPage() {
             rowKey={(sale) => sale.id}
             columns={[
               { header: 'Data', cell: (sale) => new Date(sale.createdAt).toLocaleString('pt-AO') },
-              { header: 'Total', cell: (sale) => formatKz(sale.totalCents) },
+              { header: 'Total', cell: (sale) => formatKz(sale.totalCents), align: 'right' },
               { header: 'Pagamento', cell: (sale) => paymentLabels[sale.paymentMethod] ?? sale.paymentMethod },
               {
                 header: '',
                 cell: (sale) => (
-                  <Link to={`/sales/${sale.id}`} className="text-emerald-700 hover:underline">
+                  <Link to={`/app/sales/${sale.id}`} className="font-medium text-green-700 hover:underline">
                     Ver detalhe
                   </Link>
                 ),
@@ -75,7 +75,7 @@ export function SalesPage() {
             ]}
             rows={salesQuery.data.data}
           />
-          <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+          <div className="mt-4 flex items-center justify-between text-sm text-neutral-600">
             <span>
               Página {salesQuery.data.meta.page} de {salesQuery.data.meta.totalPages}
             </span>

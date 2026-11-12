@@ -1,9 +1,13 @@
+import { ChevronLeft, ChevronRight, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
-import { Loading } from '../../components/ui/Loading';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { SkeletonTableRows } from '../../components/ui/Skeleton';
 import { Table } from '../../components/ui/Table';
 import { useCategories } from '../../hooks/useCategories';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
@@ -28,42 +32,45 @@ export function ProductsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-900">Produtos</h1>
-        <Link to="/products/new">
-          <Button>Novo produto</Button>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-3xl font-semibold text-neutral-900">Produtos</h1>
+        <Link to="/app/products/new">
+          <Button leftIcon={<Plus className="h-4 w-4" />}>Novo produto</Button>
         </Link>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <input
-          type="search"
-          placeholder="Pesquisar por nome..."
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(1);
-          }}
-          aria-label="Pesquisar produtos"
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-        />
-        <select
-          value={categoryId}
-          onChange={(event) => {
-            setCategoryId(event.target.value);
-            setPage(1);
-          }}
-          aria-label="Filtrar por categoria"
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm"
-        >
-          <option value="">Todas as categorias</option>
-          {categoriesQuery.data?.data.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
+      <div className="mb-4 flex flex-wrap items-end gap-3">
+        <div className="w-full max-w-xs">
+          <Input
+            label="Pesquisar"
+            type="search"
+            placeholder="Pesquisar por nome..."
+            value={search}
+            leftIcon={<Search className="h-4 w-4" />}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+          />
+        </div>
+        <div className="w-full max-w-xs">
+          <Select
+            label="Categoria"
+            value={categoryId}
+            onChange={(event) => {
+              setCategoryId(event.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="">Todas as categorias</option>
+            {categoriesQuery.data?.data.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <label className="flex items-center gap-2 pb-2.5 text-sm font-medium text-neutral-700">
           <input
             type="checkbox"
             checked={lowStockOnly}
@@ -71,12 +78,13 @@ export function ProductsPage() {
               setLowStockOnly(event.target.checked);
               setPage(1);
             }}
+            className="h-4 w-4 rounded border-neutral-300 text-green-600 focus:ring-green-500"
           />
           Só stock baixo
         </label>
       </div>
 
-      {productsQuery.isLoading && <Loading />}
+      {productsQuery.isLoading && <SkeletonTableRows columns={5} />}
       {productsQuery.isError && <ErrorState onRetry={() => productsQuery.refetch()} />}
       {productsQuery.data?.data.length === 0 && <EmptyState message="Nenhum produto encontrado." />}
 
@@ -88,32 +96,39 @@ export function ProductsPage() {
               {
                 header: 'Nome',
                 cell: (product) => (
-                  <Link to={`/products/${product.id}`} className="text-emerald-700 hover:underline">
+                  <Link to={`/app/products/${product.id}`} className="font-medium text-green-700 hover:underline">
                     {product.name}
                   </Link>
                 ),
               },
               { header: 'SKU', cell: (product) => product.sku },
               { header: 'Categoria', cell: (product) => product.category?.name ?? '-' },
-              { header: 'Preço', cell: (product) => formatKz(product.priceCents) },
+              { header: 'Preço', cell: (product) => formatKz(product.priceCents), align: 'right' },
               {
                 header: 'Stock',
-                cell: (product) => (
-                  <span className={product.stockQuantity <= product.minStock ? 'font-semibold text-red-600' : ''}>
-                    {product.stockQuantity}
-                  </span>
-                ),
+                align: 'right',
+                cell: (product) =>
+                  product.stockQuantity <= product.minStock ? (
+                    <Badge tone="warning">{product.stockQuantity}</Badge>
+                  ) : (
+                    product.stockQuantity
+                  ),
               },
             ]}
             rows={productsQuery.data.data}
           />
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-600">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-neutral-600">
             <span>
               Página {productsQuery.data.meta.page} de {productsQuery.data.meta.totalPages} ({productsQuery.data.meta.total}{' '}
               produtos)
             </span>
             <div className="flex gap-2">
-              <Button variant="secondary" disabled={page <= 1} onClick={() => setPage((current) => current - 1)}>
+              <Button
+                variant="secondary"
+                disabled={page <= 1}
+                onClick={() => setPage((current) => current - 1)}
+                leftIcon={<ChevronLeft className="h-4 w-4" />}
+              >
                 Anterior
               </Button>
               <Button
@@ -122,6 +137,7 @@ export function ProductsPage() {
                 onClick={() => setPage((current) => current + 1)}
               >
                 Seguinte
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>

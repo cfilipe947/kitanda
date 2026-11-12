@@ -1,17 +1,22 @@
+import { UserPlus } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { ApiError } from '../../api/http';
 import type { Role } from '../../api/types';
+import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { Input } from '../../components/ui/Input';
-import { Loading } from '../../components/ui/Loading';
 import { Modal } from '../../components/ui/Modal';
+import { Select } from '../../components/ui/Select';
+import { SkeletonTableRows } from '../../components/ui/Skeleton';
 import { Table } from '../../components/ui/Table';
+import { useToast } from '../../components/ui/Toast';
 import { useCreateUser, useUsers } from '../../hooks/useUsers';
 
 export function UsersPage() {
   const usersQuery = useUsers();
   const createUser = useCreateUser();
+  const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -34,6 +39,7 @@ export function UsersPage() {
       await createUser.mutateAsync({ name, email, password, role });
       setIsModalOpen(false);
       resetForm();
+      showToast('Utilizador criado com sucesso.');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Não foi possível criar o utilizador.');
     }
@@ -42,11 +48,13 @@ export function UsersPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-900">Utilizadores</h1>
-        <Button onClick={() => setIsModalOpen(true)}>Novo vendedor</Button>
+        <h1 className="font-heading text-3xl font-semibold text-neutral-900">Utilizadores</h1>
+        <Button onClick={() => setIsModalOpen(true)} leftIcon={<UserPlus className="h-4 w-4" />}>
+          Novo vendedor
+        </Button>
       </div>
 
-      {usersQuery.isLoading && <Loading />}
+      {usersQuery.isLoading && <SkeletonTableRows columns={3} />}
       {usersQuery.isError && <ErrorState onRetry={() => usersQuery.refetch()} />}
 
       {usersQuery.data && (
@@ -55,7 +63,14 @@ export function UsersPage() {
           columns={[
             { header: 'Nome', cell: (user) => user.name },
             { header: 'Email', cell: (user) => user.email },
-            { header: 'Papel', cell: (user) => (user.role === 'ADMIN' ? 'Administrador' : 'Vendedor') },
+            {
+              header: 'Papel',
+              cell: (user) => (
+                <Badge tone={user.role === 'ADMIN' ? 'info' : 'neutral'}>
+                  {user.role === 'ADMIN' ? 'Administrador' : 'Vendedor'}
+                </Badge>
+              ),
+            },
           ]}
           rows={usersQuery.data.data}
         />
@@ -72,26 +87,16 @@ export function UsersPage() {
             onChange={(event) => setPassword(event.target.value)}
             required
           />
-          <div>
-            <label htmlFor="role" className="mb-1 block text-sm font-medium text-slate-700">
-              Papel
-            </label>
-            <select
-              id="role"
-              value={role}
-              onChange={(event) => setRole(event.target.value as Role)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            >
-              <option value="CASHIER">Vendedor</option>
-              <option value="ADMIN">Administrador</option>
-            </select>
-          </div>
+          <Select label="Papel" value={role} onChange={(event) => setRole(event.target.value as Role)}>
+            <option value="CASHIER">Vendedor</option>
+            <option value="ADMIN">Administrador</option>
+          </Select>
           {error && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-danger-600">
               {error}
             </p>
           )}
-          <Button type="submit" disabled={createUser.isPending}>
+          <Button type="submit" isLoading={createUser.isPending}>
             {createUser.isPending ? 'A criar...' : 'Criar'}
           </Button>
         </form>

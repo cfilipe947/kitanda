@@ -16,8 +16,8 @@ export function SaleDetailPage() {
 
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-semibold text-slate-900">Venda</h1>
-      <p className="mb-6 text-sm text-slate-500">
+      <h1 className="mb-2 font-heading text-3xl font-semibold text-neutral-900">Venda</h1>
+      <p className="mb-6 text-sm text-neutral-500">
         {new Date(sale.createdAt).toLocaleString('pt-AO')} · {sale.user?.name ?? '-'}
       </p>
 
@@ -25,14 +25,16 @@ export function SaleDetailPage() {
         rowKey={(item) => item.id}
         columns={[
           { header: 'Produto', cell: (item) => item.product?.name ?? item.productId },
-          { header: 'Quantidade', cell: (item) => item.quantity },
-          { header: 'Preço unitário', cell: (item) => formatKz(item.unitPriceCents) },
-          { header: 'Subtotal', cell: (item) => formatKz(item.unitPriceCents * item.quantity) },
+          { header: 'Quantidade', cell: (item) => item.quantity, align: 'right' },
+          { header: 'Preço unitário', cell: (item) => formatKz(item.unitPriceCents), align: 'right' },
+          { header: 'Subtotal', cell: (item) => formatKz(item.unitPriceCents * item.quantity), align: 'right' },
         ]}
         rows={sale.items}
       />
 
-      <div className="mt-4 text-right text-lg font-semibold text-slate-900">Total: {formatKz(sale.totalCents)}</div>
+      <div className="mt-4 text-right font-heading text-xl font-semibold tabular-nums text-neutral-900">
+        Total: {formatKz(sale.totalCents)}
+      </div>
     </div>
   );
 }

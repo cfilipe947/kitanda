@@ -3,12 +3,15 @@ import { ApiError } from '../../api/http';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
+import { Select } from '../../components/ui/Select';
+import { useToast } from '../../components/ui/Toast';
 import { useAddStockMovement } from '../../hooks/useProducts';
 
 type Props = { productId: string; isOpen: boolean; onClose: () => void };
 
 export function StockMovementModal({ productId, isOpen, onClose }: Props) {
   const addStockMovement = useAddStockMovement(productId);
+  const { showToast } = useToast();
   const [type, setType] = useState<'IN' | 'ADJUSTMENT'>('IN');
   const [quantity, setQuantity] = useState('');
   const [reason, setReason] = useState('');
@@ -34,6 +37,7 @@ export function StockMovementModal({ productId, isOpen, onClose }: Props) {
 
     try {
       await addStockMovement.mutateAsync({ type, quantity: parsedQuantity, reason: reason || undefined });
+      showToast('Movimento de stock registado com sucesso.');
       handleClose();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Não foi possível registar o movimento.');
@@ -43,20 +47,10 @@ export function StockMovementModal({ productId, isOpen, onClose }: Props) {
   return (
     <Modal title="Entrada de stock" isOpen={isOpen} onClose={handleClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div>
-          <label htmlFor="movement-type" className="mb-1 block text-sm font-medium text-slate-700">
-            Tipo
-          </label>
-          <select
-            id="movement-type"
-            value={type}
-            onChange={(event) => setType(event.target.value as 'IN' | 'ADJUSTMENT')}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          >
-            <option value="IN">Entrada</option>
-            <option value="ADJUSTMENT">Ajuste (quebra, inventário...)</option>
-          </select>
-        </div>
+        <Select label="Tipo" value={type} onChange={(event) => setType(event.target.value as 'IN' | 'ADJUSTMENT')}>
+          <option value="IN">Entrada</option>
+          <option value="ADJUSTMENT">Ajuste (quebra, inventário...)</option>
+        </Select>
         <Input
           label={type === 'IN' ? 'Quantidade' : 'Quantidade (negativa para reduzir)'}
           type="number"
@@ -66,11 +60,11 @@ export function StockMovementModal({ productId, isOpen, onClose }: Props) {
         />
         <Input label="Motivo (opcional)" value={reason} onChange={(event) => setReason(event.target.value)} />
         {error && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-danger-600">
             {error}
           </p>
         )}
-        <Button type="submit" disabled={addStockMovement.isPending}>
+        <Button type="submit" isLoading={addStockMovement.isPending}>
           {addStockMovement.isPending ? 'A guardar...' : 'Guardar'}
         </Button>
       </form>

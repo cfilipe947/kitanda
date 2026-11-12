@@ -1,11 +1,15 @@
+import { Package, Plus } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiError } from '../../api/http';
 import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { Input } from '../../components/ui/Input';
 import { Loading } from '../../components/ui/Loading';
+import { Select } from '../../components/ui/Select';
 import { Table } from '../../components/ui/Table';
+import { useToast } from '../../components/ui/Toast';
 import { useCategories } from '../../hooks/useCategories';
 import { useCreateProduct, useProduct, useUpdateProduct } from '../../hooks/useProducts';
 import { parseKzToCents } from '../../lib/format';
@@ -17,6 +21,7 @@ export function ProductFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEditing = Boolean(id);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const categoriesQuery = useCategories();
   const productQuery = useProduct(id);
@@ -83,7 +88,8 @@ export function ProductFormPage() {
           stockQuantity: Number.parseInt(stockQuantity, 10) || 0,
         });
       }
-      navigate('/products');
+      showToast(isEditing ? 'Produto actualizado com sucesso.' : 'Produto criado com sucesso.');
+      navigate('/app/products');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Não foi possível guardar o produto.');
     }
@@ -93,108 +99,107 @@ export function ProductFormPage() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="mb-6 text-2xl font-semibold text-slate-900">{isEditing ? 'Editar produto' : 'Novo produto'}</h1>
+      <h1 className="mb-6 flex items-center gap-2 font-heading text-3xl font-semibold text-neutral-900">
+        <Package aria-hidden="true" className="h-7 w-7 text-green-700" />
+        {isEditing ? 'Editar produto' : 'Novo produto'}
+      </h1>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-        <Input label="Nome" value={name} onChange={(event) => setName(event.target.value)} required />
-        <Input label="SKU" value={sku} onChange={(event) => setSku(event.target.value)} required />
+      <Card>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+          <Input label="Nome" value={name} onChange={(event) => setName(event.target.value)} required />
+          <Input label="SKU" value={sku} onChange={(event) => setSku(event.target.value)} required />
 
-        <div>
-          <label htmlFor="category" className="mb-1 block text-sm font-medium text-slate-700">
-            Categoria
-          </label>
-          <select
-            id="category"
-            value={categoryId}
-            onChange={(event) => setCategoryId(event.target.value)}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            required
-          >
+          <Select label="Categoria" value={categoryId} onChange={(event) => setCategoryId(event.target.value)} required>
             <option value="">Selecciona uma categoria</option>
             {categoriesQuery.data?.data.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>
             ))}
-          </select>
-        </div>
+          </Select>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Preço (Kz)"
-            type="number"
-            step="0.01"
-            min="0"
-            value={priceKz}
-            onChange={(event) => setPriceKz(event.target.value)}
-            required
-          />
-          <Input
-            label="Custo (Kz)"
-            type="number"
-            step="0.01"
-            min="0"
-            value={costKz}
-            onChange={(event) => setCostKz(event.target.value)}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Stock mínimo"
-            type="number"
-            min="0"
-            value={minStock}
-            onChange={(event) => setMinStock(event.target.value)}
-          />
-          {isEditing ? (
-            <div className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-slate-700">Stock actual</span>
-              <span className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
-                {productQuery.data?.stockQuantity ?? '-'}
-              </span>
-            </div>
-          ) : (
+          <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Stock inicial"
+              label="Preço (Kz)"
+              type="number"
+              step="0.01"
+              min="0"
+              value={priceKz}
+              onChange={(event) => setPriceKz(event.target.value)}
+              required
+            />
+            <Input
+              label="Custo (Kz)"
+              type="number"
+              step="0.01"
+              min="0"
+              value={costKz}
+              onChange={(event) => setCostKz(event.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Stock mínimo"
               type="number"
               min="0"
-              value={stockQuantity}
-              onChange={(event) => setStockQuantity(event.target.value)}
+              value={minStock}
+              onChange={(event) => setMinStock(event.target.value)}
             />
+            {isEditing ? (
+              <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-neutral-700">Stock actual</span>
+                <span className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm tabular-nums text-neutral-600">
+                  {productQuery.data?.stockQuantity ?? '-'}
+                </span>
+              </div>
+            ) : (
+              <Input
+                label="Stock inicial"
+                type="number"
+                min="0"
+                value={stockQuantity}
+                onChange={(event) => setStockQuantity(event.target.value)}
+              />
+            )}
+          </div>
+
+          {error && (
+            <p role="alert" className="text-sm text-danger-600">
+              {error}
+            </p>
           )}
-        </div>
 
-        {error && (
-          <p role="alert" className="text-sm text-red-600">
-            {error}
-          </p>
-        )}
-
-        <div className="flex gap-3">
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? 'A guardar...' : 'Guardar'}
-          </Button>
-          {isEditing && (
-            <Button type="button" variant="secondary" onClick={() => setIsStockModalOpen(true)}>
-              Entrada de stock
+          <div className="flex gap-3">
+            <Button type="submit" isLoading={isSaving}>
+              {isSaving ? 'A guardar...' : 'Guardar'}
             </Button>
-          )}
-        </div>
-      </form>
+            {isEditing && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setIsStockModalOpen(true)}
+                leftIcon={<Plus className="h-4 w-4" />}
+              >
+                Entrada de stock
+              </Button>
+            )}
+          </div>
+        </form>
+      </Card>
 
       {isEditing && productQuery.data && (
         <div className="mt-10">
-          <h2 className="mb-3 text-lg font-semibold text-slate-900">Histórico de movimentos</h2>
+          <h2 className="mb-3 font-heading text-lg font-semibold text-neutral-900">Histórico de movimentos</h2>
           {productQuery.data.movements.length === 0 ? (
-            <p className="text-sm text-slate-500">Sem movimentos.</p>
+            <p className="text-sm text-neutral-500">Sem movimentos.</p>
           ) : (
             <Table
               rowKey={(movement) => movement.id}
               columns={[
                 { header: 'Data', cell: (movement) => new Date(movement.createdAt).toLocaleString('pt-AO') },
                 { header: 'Tipo', cell: (movement) => movementLabels[movement.type] ?? movement.type },
-                { header: 'Quantidade', cell: (movement) => movement.quantity },
+                { header: 'Quantidade', cell: (movement) => movement.quantity, align: 'right' },
                 { header: 'Motivo', cell: (movement) => movement.reason ?? '-' },
                 { header: 'Utilizador', cell: (movement) => movement.user?.name ?? '-' },
               ]}
