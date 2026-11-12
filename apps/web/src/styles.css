@@ -1,1 +1,103 @@
 @import 'tailwindcss';
+
+/*
+ * Sistema de design do Kitanda — "Banco de bairro moderno".
+ * Verde confiante + neutros esverdeados + cores de estado dedicadas.
+ * Tudo aqui é token: nenhuma cor deve ser escrita à mão nos componentes.
+ */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Fraunces', ui-serif, Georgia, serif;
+
+  --color-green-50: #f1fbf6;
+  --color-green-100: #def4e6;
+  --color-green-200: #b9e7cb;
+  --color-green-300: #8ed9ac;
+  --color-green-400: #57c488;
+  --color-green-500: #1e9e63;
+  --color-green-600: #107a48;
+  --color-green-700: #0c5f38;
+  --color-green-800: #0a4a2c;
+  --color-green-900: #073522;
+
+  --color-neutral-50: #f7f9f8;
+  --color-neutral-100: #eef2f0;
+  --color-neutral-200: #dde4e0;
+  --color-neutral-300: #c2ccc6;
+  --color-neutral-400: #96a59c;
+  --color-neutral-500: #6e7e74;
+  --color-neutral-600: #51615a;
+  --color-neutral-700: #3a4842;
+  --color-neutral-800: #263029;
+  --color-neutral-900: #151c17;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-500: #d97706;
+  --color-warning-600: #b45309;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-500: #dc2626;
+  --color-danger-600: #b91c1c;
+
+  --color-info-50: #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-500: #2563eb;
+  --color-info-600: #1d4ed8;
+
+  --shadow-soft: 0 10px 30px -14px rgba(16, 122, 72, 0.28), 0 2px 8px -4px rgba(16, 122, 72, 0.12);
+  --shadow-soft-lg: 0 24px 48px -20px rgba(16, 122, 72, 0.32), 0 4px 12px -4px rgba(16, 122, 72, 0.14);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--color-neutral-50);
+    color: var(--color-neutral-800);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@keyframes kitanda-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kitanda-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: kitanda-fade-in 0.35s ease-out both;
+}
+
+.animate-scale-in {
+  animation: kitanda-scale-in 0.2s ease-out both;
+}

@@ -4,32 +4,46 @@ type Column<T> = {
   header: string;
   cell: (row: T) => ReactNode;
   className?: string;
+  align?: 'left' | 'right';
 };
 
 type TableProps<T> = {
   columns: Column<T>[];
   rows: T[];
   rowKey: (row: T) => string;
+  onRowClick?: (row: T) => void;
 };
 
-export function Table<T>({ columns, rows, rowKey }: TableProps<T>) {
+export function Table<T>({ columns, rows, rowKey, onRowClick }: TableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200">
-      <table className="min-w-full divide-y divide-slate-200 text-sm">
-        <thead className="bg-slate-50">
+    <div className="overflow-x-auto rounded-xl border border-neutral-200">
+      <table className="min-w-full divide-y divide-neutral-200 text-sm">
+        <thead className="bg-neutral-50">
           <tr>
             {columns.map((col) => (
-              <th key={col.header} className="px-3 py-2 text-left font-semibold text-slate-600">
+              <th
+                key={col.header}
+                className={`px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 ${
+                  col.align === 'right' ? 'text-right' : 'text-left'
+                }`}
+              >
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 bg-white">
+        <tbody className="divide-y divide-neutral-100 bg-white">
           {rows.map((row) => (
-            <tr key={rowKey(row)}>
+            <tr
+              key={rowKey(row)}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              className={onRowClick ? 'cursor-pointer transition-colors hover:bg-green-50/60' : 'transition-colors hover:bg-neutral-50'}
+            >
               {columns.map((col) => (
-                <td key={col.header} className={`px-3 py-2 ${col.className ?? ''}`}>
+                <td
+                  key={col.header}
+                  className={`px-4 py-3 tabular-nums ${col.align === 'right' ? 'text-right' : ''} ${col.className ?? ''}`}
+                >
                   {col.cell(row)}
                 </td>
               ))}
