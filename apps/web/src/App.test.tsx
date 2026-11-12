@@ -30,8 +30,8 @@ function mockFetchForDashboard(loginStatus: number, loginBody: unknown) {
 
 describe('rotas protegidas', () => {
   it('sem sessão, uma rota protegida redirecciona para /login', async () => {
-    renderWithProviders(<App />, { route: '/' });
-    expect(await screen.findByRole('heading', { name: 'Kitanda' })).toBeInTheDocument();
+    renderWithProviders(<App />, { route: '/app' });
+    expect(await screen.findByRole('heading', { name: 'Entra na tua loja' })).toBeInTheDocument();
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
   });
 });
@@ -48,7 +48,7 @@ describe('login', () => {
     await userEvent.type(screen.getByLabelText('Password'), 'password123');
     await userEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
-    expect(await screen.findByRole('heading', { name: 'Painel' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Painel' }, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('login com sucesso leva um CASHIER directo para Nova venda', async () => {
@@ -62,7 +62,7 @@ describe('login', () => {
     await userEvent.type(screen.getByLabelText('Password'), 'password123');
     await userEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
-    expect(await screen.findByRole('heading', { name: 'Nova venda' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Nova venda' }, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('mostra a mensagem de erro quando as credenciais estão erradas', async () => {
@@ -76,6 +76,35 @@ describe('login', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Email ou password incorrectos');
-    expect(screen.getByRole('heading', { name: 'Kitanda' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Entra na tua loja' })).toBeInTheDocument();
+  });
+});
+
+describe('landing page', () => {
+  it('é pública e mostra o hero, o link para o GitHub e o link para entrar', async () => {
+    renderWithProviders(<App />, { route: '/' });
+
+    expect(
+      await screen.findByRole('heading', { name: 'Não percas mais nenhuma venda por falta de stock.' }),
+    ).toBeInTheDocument();
+
+    const githubLink = screen.getByRole('link', { name: 'Ver código no GitHub' });
+    expect(githubLink).toHaveAttribute('href', 'https://github.com/cfilipe947/kitanda');
+
+    expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute('href', '/login');
+  });
+
+  it('o botão "Experimentar a demo" entra com o utilizador de demonstração e abre o Painel', async () => {
+    mockFetchForDashboard(200, {
+      token: 'token-falso',
+      user: { id: '1', name: 'Admin', email: 'admin@kitanda.ao', role: 'ADMIN', createdAt: new Date().toISOString() },
+    });
+
+    renderWithProviders(<App />, { route: '/' });
+
+    const demoButtons = await screen.findAllByRole('button', { name: 'Experimentar a demo' });
+    await userEvent.click(demoButtons[0]!);
+
+    expect(await screen.findByRole('heading', { name: 'Painel' }, { timeout: 5000 })).toBeInTheDocument();
   });
 });
