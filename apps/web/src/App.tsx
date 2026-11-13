@@ -16,6 +16,7 @@ const NewSalePage = lazy(() => import('./pages/Sales/NewSalePage').then((m) => (
 const SalesPage = lazy(() => import('./pages/Sales/SalesPage').then((m) => ({ default: m.SalesPage })));
 const SaleDetailPage = lazy(() => import('./pages/Sales/SaleDetailPage').then((m) => ({ default: m.SaleDetailPage })));
 const UsersPage = lazy(() => import('./pages/Users/UsersPage').then((m) => ({ default: m.UsersPage })));
+const ReportsPage = lazy(() => import('./pages/Reports/ReportsPage').then((m) => ({ default: m.ReportsPage })));
 
 export function App() {
   return (
@@ -50,6 +51,14 @@ export function App() {
           element={
             <ProtectedRoute roles={['ADMIN']}>
               <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="reports"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <ReportsPage />
             </ProtectedRoute>
           }
         />

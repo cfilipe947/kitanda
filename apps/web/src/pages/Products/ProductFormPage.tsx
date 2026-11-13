@@ -1,5 +1,5 @@
 import { Package, Plus } from 'lucide-react';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiError } from '../../api/http';
 import { Button } from '../../components/ui/Button';
@@ -12,7 +12,7 @@ import { Table } from '../../components/ui/Table';
 import { useToast } from '../../components/ui/Toast';
 import { useCategories } from '../../hooks/useCategories';
 import { useCreateProduct, useProduct, useUpdateProduct } from '../../hooks/useProducts';
-import { parseKzToCents } from '../../lib/format';
+import { formatKz, parseKzToCents } from '../../lib/format';
 import { StockMovementModal } from './StockMovementModal';
 
 const movementLabels: Record<string, string> = { IN: 'Entrada', OUT: 'Venda', ADJUSTMENT: 'Ajuste' };
@@ -97,6 +97,14 @@ export function ProductFormPage() {
 
   const isSaving = createProduct.isPending || updateProduct.isPending;
 
+  const margin = useMemo(() => {
+    const priceCents = parseKzToCents(priceKz);
+    const costCents = parseKzToCents(costKz);
+    if (priceCents <= 0) return null;
+    const marginCents = priceCents - costCents;
+    return { marginCents, marginPct: (marginCents / priceCents) * 100 };
+  }, [priceKz, costKz]);
+
   return (
     <div className="max-w-xl">
       <h1 className="mb-6 flex items-center gap-2 font-heading text-3xl font-semibold text-neutral-900">
@@ -120,7 +128,7 @@ export function ProductFormPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Preço (Kz)"
+              label="Preço de venda (Kz)"
               type="number"
               step="0.01"
               min="0"
@@ -129,7 +137,7 @@ export function ProductFormPage() {
               required
             />
             <Input
-              label="Custo (Kz)"
+              label="Preço de compra (Kz)"
               type="number"
               step="0.01"
               min="0"
@@ -137,6 +145,17 @@ export function ProductFormPage() {
               onChange={(event) => setCostKz(event.target.value)}
             />
           </div>
+
+          {margin && (
+            <p className="text-sm text-neutral-600">
+              Margem de lucro:{' '}
+              <span
+                className={`font-semibold tabular-nums ${margin.marginCents >= 0 ? 'text-green-700' : 'text-danger-600'}`}
+              >
+                {formatKz(margin.marginCents)} ({margin.marginPct.toFixed(1)}%)
+              </span>
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <Input

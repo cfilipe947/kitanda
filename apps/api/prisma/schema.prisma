@@ -92,11 +92,12 @@ model Sale {
 }
 
 model SaleItem {
-  id             String  @id @default(uuid())
-  saleId         String
-  sale           Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  productId      String
-  product        Product @relation(fields: [productId], references: [id])
-  quantity       Int
-  unitPriceCents Int
+  id              String  @id @default(uuid())
+  saleId          String
+  sale            Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product @relation(fields: [productId], references: [id])
+  quantity        Int
+  unitPriceCents  Int
+  costCentsAtSale Int
 }

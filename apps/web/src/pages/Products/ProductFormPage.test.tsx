@@ -32,7 +32,7 @@ describe('ProductFormPage — validação', () => {
 
     await userEvent.type(await screen.findByLabelText('Nome'), 'Arroz 1kg');
     await userEvent.type(screen.getByLabelText('SKU'), 'MER-001');
-    await userEvent.type(screen.getByLabelText('Preço (Kz)'), '850');
+    await userEvent.type(screen.getByLabelText('Preço de venda (Kz)'), '850');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Preenche o nome, o SKU e a categoria.');
@@ -58,7 +58,7 @@ describe('ProductFormPage — validação', () => {
     await userEvent.type(await screen.findByLabelText('Nome'), 'Arroz 1kg');
     await userEvent.type(screen.getByLabelText('SKU'), 'MER-001');
     await userEvent.selectOptions(await screen.findByLabelText('Categoria'), 'cat-1');
-    await userEvent.type(screen.getByLabelText('Preço (Kz)'), '850');
+    await userEvent.type(screen.getByLabelText('Preço de venda (Kz)'), '850');
     await userEvent.click(screen.getByRole('button', { name: 'Guardar' }));
 
     await waitFor(() => expect(calls.some((call) => call.init?.method === 'POST')).toBe(true));
@@ -67,5 +67,15 @@ describe('ProductFormPage — validação', () => {
     const body = JSON.parse(createCall.init?.body as string);
     expect(body.priceCents).toBe(85000);
     expect(body.categoryId).toBe('cat-1');
+  });
+
+  it('mostra a margem de lucro calculada a partir do preço de venda e de compra', async () => {
+    mockFetchRouter();
+    renderWithProviders(<ProductFormPage />, { route: '/products/new' });
+
+    await userEvent.type(await screen.findByLabelText('Preço de venda (Kz)'), '1000');
+    await userEvent.type(screen.getByLabelText('Preço de compra (Kz)'), '650');
+
+    expect(await screen.findByText('350,00 Kz (35.0%)')).toBeInTheDocument();
   });
 });

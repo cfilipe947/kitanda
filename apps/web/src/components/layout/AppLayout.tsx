@@ -1,4 +1,4 @@
-import { LayoutDashboard, LogOut, Menu, Package, Receipt, ShoppingCart, Users } from 'lucide-react';
+import { LayoutDashboard, LogOut, Menu, Package, Receipt, ShoppingCart, TrendingUp, Users } from 'lucide-react';
 import { Suspense, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -11,6 +11,7 @@ const navItems = [
   { to: '/app/products', label: 'Produtos', icon: Package, adminOnly: false, primary: true },
   { to: '/app/sales/new', label: 'Nova venda', icon: ShoppingCart, adminOnly: false, primary: true },
   { to: '/app/sales', label: 'Vendas', icon: Receipt, adminOnly: false, primary: true },
+  { to: '/app/reports', label: 'Relatórios', icon: TrendingUp, adminOnly: true, primary: false },
   { to: '/app/users', label: 'Utilizadores', icon: Users, adminOnly: true, primary: false },
 ];
 

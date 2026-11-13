@@ -8,3 +8,8 @@ export const topProductsQuerySchema = z.object({
   limit: z.coerce.number().int().positive().max(50).default(5),
   days: z.coerce.number().int().positive().max(365).default(30),
 });
+
+export const profitReportQuerySchema = z.object({
+  period: z.enum(['week', 'month', 'year']).default('week'),
+  date: z.coerce.date().optional(),
+});

@@ -19,7 +19,7 @@ async function createProduct(
   app: ReturnType<typeof createApp>,
   token: string,
   categoryId: string,
-  overrides: Partial<{ name: string; sku: string; priceCents: number; stockQuantity: number }> = {},
+  overrides: Partial<{ name: string; sku: string; priceCents: number; costCents: number; stockQuantity: number }> = {},
 ) {
   const res = await request(app)
     .post('/api/v1/products')
@@ -75,6 +75,31 @@ describe('vendas', () => {
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(saleDetail.body.items[0].unitPriceCents).toBe(85000);
+    });
+
+    it('guarda o custo do momento (costCentsAtSale) e mantém-no depois de o custo do produto mudar', async () => {
+      const app = createApp();
+      const adminToken = await registerAdmin(app);
+      const categoryId = await createCategory(app, adminToken);
+      const product = await createProduct(app, adminToken, categoryId, { priceCents: 85000, costCents: 65000, stockQuantity: 10 });
+
+      const sale = await request(app)
+        .post('/api/v1/sales')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ paymentMethod: 'CASH', items: [{ productId: product.id, quantity: 2 }] });
+
+      expect(sale.body.items[0].costCentsAtSale).toBe(65000);
+
+      await request(app)
+        .patch(`/api/v1/products/${product.id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ costCents: 70000 });
+
+      const saleDetail = await request(app)
+        .get(`/api/v1/sales/${sale.body.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(saleDetail.body.items[0].costCentsAtSale).toBe(65000);
     });
 
     it('409 INSUFFICIENT_STOCK e não grava nada se um item falhar', async () => {

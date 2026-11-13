@@ -97,7 +97,12 @@ async function main() {
       const remaining = remainingStock.get(product.id) ?? 0;
       const quantity = 1 + Math.floor(Math.random() * Math.min(2, remaining));
       remainingStock.set(product.id, remaining - quantity);
-      return { productId: product.id, quantity, unitPriceCents: product.priceCents };
+      return {
+        productId: product.id,
+        quantity,
+        unitPriceCents: product.priceCents,
+        costCentsAtSale: product.costCents,
+      };
     });
     const totalCents = items.reduce((sum, item) => sum + item.unitPriceCents * item.quantity, 0);
 

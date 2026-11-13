@@ -61,6 +61,7 @@ export type SaleItem = {
   productId: string;
   quantity: number;
   unitPriceCents: number;
+  costCentsAtSale: number;
   product?: { id: string; name: string; sku: string };
 };
 
@@ -84,3 +85,35 @@ export type ReportSummary = {
 export type SalesByDayPoint = { day: string; totalCents: number; count: number };
 
 export type TopProduct = { productId: string; name: string; totalQuantity: number; totalCents: number };
+
+export type ProfitPeriod = 'week' | 'month' | 'year';
+
+export type ProfitSeriesPoint = {
+  bucket: string;
+  revenueCents: number;
+  costCents: number;
+  profitCents: number;
+  count: number;
+};
+
+export type ProfitTopProduct = {
+  productId: string;
+  name: string;
+  totalQuantity: number;
+  revenueCents: number;
+  costCents: number;
+  profitCents: number;
+};
+
+export type ProfitReport = {
+  period: ProfitPeriod;
+  from: string;
+  to: string;
+  revenueCents: number;
+  costCents: number;
+  profitCents: number;
+  marginPct: number;
+  salesCount: number;
+  series: ProfitSeriesPoint[];
+  topProducts: ProfitTopProduct[];
+};

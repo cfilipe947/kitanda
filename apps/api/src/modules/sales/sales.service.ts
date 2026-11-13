@@ -48,7 +48,7 @@ export async function create(
 ) {
   return prisma.$transaction(async (tx) => {
     let totalCents = 0;
-    const itemsData: { productId: string; quantity: number; unitPriceCents: number }[] = [];
+    const itemsData: { productId: string; quantity: number; unitPriceCents: number; costCentsAtSale: number }[] = [];
 
     for (const item of input.items) {
       const product = await tx.product.findUnique({ where: { id: item.productId } });
@@ -59,7 +59,12 @@ export async function create(
         throw new AppError(409, 'INSUFFICIENT_STOCK', `Stock insuficiente para "${product.name}"`);
       }
 
-      itemsData.push({ productId: product.id, quantity: item.quantity, unitPriceCents: product.priceCents });
+      itemsData.push({
+        productId: product.id,
+        quantity: item.quantity,
+        unitPriceCents: product.priceCents,
+        costCentsAtSale: product.costCents,
+      });
       totalCents += product.priceCents * item.quantity;
 
       await tx.product.update({

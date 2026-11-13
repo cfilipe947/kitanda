@@ -11,5 +11,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/setupTests.ts'],
+    // Login + lazy-load do Painel (Recharts) pode ultrapassar os 5s por omissão numa máquina ocupada.
+    testTimeout: 15000,
   },
 });

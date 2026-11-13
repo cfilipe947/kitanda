@@ -105,6 +105,14 @@ export function ProductsPage() {
               { header: 'Categoria', cell: (product) => product.category?.name ?? '-' },
               { header: 'Preço', cell: (product) => formatKz(product.priceCents), align: 'right' },
               {
+                header: 'Margem',
+                align: 'right',
+                cell: (product) =>
+                  product.priceCents > 0
+                    ? `${(((product.priceCents - product.costCents) / product.priceCents) * 100).toFixed(1)}%`
+                    : '-',
+              },
+              {
                 header: 'Stock',
                 align: 'right',
                 cell: (product) =>
