@@ -1,12 +1,10 @@
 import {
   AlertTriangle,
   BarChart3,
-  BookOpen,
   CheckCircle2,
   ClipboardList,
   Code2,
   Link2,
-  Lock,
   Mail,
   Package,
   ShieldCheck,
@@ -15,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { API_URL, ApiError } from '../../api/http';
+import { ApiError } from '../../api/http';
 import { Button } from '../../components/ui/Button';
 import { Reveal } from '../../components/ui/Reveal';
 import { useAuth } from '../../hooks/useAuth';
@@ -24,7 +22,6 @@ import { DashboardPreview } from './DashboardPreview';
 const GITHUB_URL = 'https://github.com/cfilipe947/kitanda';
 const LINKEDIN_URL = 'https://linkedin.com/in/cesénio-filipe-003b78319';
 const EMAIL = 'wagnerfilipe997@gmail.com';
-const API_DOCS_URL = API_URL.replace(/\/api\/v1$/, '/api/docs');
 
 function useDemoLogin() {
   const { login } = useAuth();
@@ -59,9 +56,6 @@ function Navbar({ onDemo, isDemoLoading }: { onDemo: () => void; isDemoLoading: 
           </a>
           <a href="#como-funciona" className="hover:text-green-700">
             Como funciona
-          </a>
-          <a href="#tecnologia" className="hover:text-green-700">
-            Tecnologia
           </a>
         </nav>
         <div className="flex items-center gap-2">
@@ -279,76 +273,6 @@ function MobileSection() {
   );
 }
 
-const techStack = ['Node.js', 'TypeScript', 'Express 5', 'PostgreSQL + Prisma 7', 'React 19', 'Vite', 'TanStack Query', 'Recharts'];
-const securityPoints = [
-  'Palavras-passe com bcrypt, nunca guardadas em texto simples',
-  'JWT com expiração e segredo fora do código',
-  'Validação de todo o input com Zod',
-  'Helmet, CORS restrito e rate limit no login',
-];
-
-function TechSection() {
-  return (
-    <section id="tecnologia" className="mx-auto max-w-6xl px-4 py-16 lg:px-8 lg:py-24">
-      <Reveal>
-        <h2 className="text-center font-heading text-3xl font-semibold text-neutral-900">Por baixo do capô</h2>
-        <p className="mx-auto mt-3 max-w-xl text-center text-neutral-600">
-          Um projecto de portfólio feito para resistir a escrutínio técnico, não só para parecer bonito.
-        </p>
-      </Reveal>
-
-      <div className="mt-10 grid gap-6 lg:grid-cols-3">
-        <Reveal className="rounded-xl border border-neutral-200 bg-white p-6">
-          <h3 className="flex items-center gap-2 font-heading text-base font-semibold text-neutral-900">
-            <BarChart3 aria-hidden="true" className="h-5 w-5 text-green-700" />
-            Stack
-          </h3>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {techStack.map((tech) => (
-              <li key={tech} className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-                {tech}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-
-        <Reveal delayMs={80} className="rounded-xl border border-neutral-200 bg-white p-6">
-          <h3 className="flex items-center gap-2 font-heading text-base font-semibold text-neutral-900">
-            <Lock aria-hidden="true" className="h-5 w-5 text-green-700" />
-            Segurança
-          </h3>
-          <ul className="mt-3 flex flex-col gap-2 text-sm text-neutral-600">
-            {securityPoints.map((point) => (
-              <li key={point} className="flex items-start gap-2">
-                <CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
-                {point}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-
-        <Reveal delayMs={160} className="rounded-xl border border-neutral-200 bg-white p-6">
-          <h3 className="flex items-center gap-2 font-heading text-base font-semibold text-neutral-900">
-            <BookOpen aria-hidden="true" className="h-5 w-5 text-green-700" />
-            Testes, CI e documentação
-          </h3>
-          <p className="mt-3 text-sm text-neutral-600">
-            Testes de integração (Vitest + Supertest) e de componentes, correndo no GitHub Actions a cada alteração.
-          </p>
-          <div className="mt-4 flex flex-col gap-2 text-sm font-medium text-green-700">
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:underline">
-              <Code2 aria-hidden="true" className="h-4 w-4" /> Código fonte no GitHub
-            </a>
-            <a href={API_DOCS_URL} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:underline">
-              <BookOpen aria-hidden="true" className="h-4 w-4" /> Documentação da API (Swagger)
-            </a>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 function CtaFooter({ onDemo, isDemoLoading }: { onDemo: () => void; isDemoLoading: boolean }) {
   return (
     <>
@@ -415,7 +339,6 @@ export function LandingPage() {
         <Features />
         <HowItWorks />
         <MobileSection />
-        <TechSection />
       </main>
       <CtaFooter onDemo={startDemo} isDemoLoading={isLoading} />
     </div>
