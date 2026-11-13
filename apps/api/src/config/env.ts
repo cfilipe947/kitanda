@@ -9,6 +9,12 @@ const envSchema = z
     JWT_SECRET: z.string().min(32, 'JWT_SECRET precisa de pelo menos 32 caracteres'),
     JWT_EXPIRES_IN: z.string().default('8h'),
     CORS_ORIGIN: z.string().default('http://localhost:5173'),
+    // "true" activa o POST /demo/start (repõe os dados padrão a cada entrada na demo).
+    // Desligado por omissão: numa loja real, um endpoint público que apaga dados não pode existir.
+    DEMO_MODE: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((value) => value === 'true'),
     DATABASE_URL: z.string().optional(),
     DATABASE_URL_TEST: z.string().optional(),
   })

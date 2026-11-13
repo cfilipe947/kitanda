@@ -17,7 +17,7 @@ function mockFetchForDashboard(loginStatus: number, loginBody: unknown) {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string) => {
-      if (url.includes('/auth/login')) return jsonResponse(loginStatus, loginBody);
+      if (url.includes('/auth/login') || url.includes('/demo/start')) return jsonResponse(loginStatus, loginBody);
       if (url.includes('/reports/summary')) {
         return jsonResponse(200, { today: { totalCents: 0, count: 0 }, month: { totalCents: 0, count: 0 }, lowStockCount: 0 });
       }
@@ -94,7 +94,7 @@ describe('landing page', () => {
     expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute('href', '/login');
   });
 
-  it('o botão "Experimentar a demo" entra com o utilizador de demonstração e abre o Painel', async () => {
+  it('o botão "Experimentar a demo" repõe a loja de demonstração e abre o Painel', async () => {
     mockFetchForDashboard(200, {
       token: 'token-falso',
       user: { id: '1', name: 'Admin', email: 'admin@kitanda.ao', role: 'ADMIN', createdAt: new Date().toISOString() },
@@ -106,5 +106,10 @@ describe('landing page', () => {
     await userEvent.click(demoButtons[0]!);
 
     expect(await screen.findByRole('heading', { name: 'Painel' }, { timeout: 5000 })).toBeInTheDocument();
+
+    // Usa o endpoint da demo (que repõe os dados padrão), não o login normal.
+    const calledUrls = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
+    expect(calledUrls.some((url) => url.endsWith('/demo/start'))).toBe(true);
+    expect(calledUrls.some((url) => url.includes('/auth/login'))).toBe(false);
   });
 });

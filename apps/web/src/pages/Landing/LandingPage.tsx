@@ -24,7 +24,7 @@ const LINKEDIN_URL = 'https://linkedin.com/in/cesénio-filipe-003b78319';
 const EMAIL = 'wagnerfilipe997@gmail.com';
 
 function useDemoLogin() {
-  const { login } = useAuth();
+  const { startDemo: startDemoSession } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ function useDemoLogin() {
     setError(null);
     setIsLoading(true);
     try {
-      const user = await login('admin@kitanda.ao', 'admin123');
+      const user = await startDemoSession();
       navigate(user.role === 'ADMIN' ? '/app' : '/app/sales/new');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Não foi possível abrir a demonstração agora.');

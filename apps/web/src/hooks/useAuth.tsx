@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import * as authApi from '../api/auth';
 import { UNAUTHORIZED_EVENT } from '../api/http';
 import { clearToken, getToken, setToken } from '../lib/authStorage';
-import type { User } from '../api/types';
+import type { AuthResponse, User } from '../api/types';
 
 type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  startDemo: () => Promise<User>;
   logout: () => void;
 };
 
@@ -53,11 +54,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(UNAUTHORIZED_EVENT, handleUnauthorized);
   }, [navigate]);
 
-  async function login(email: string, password: string) {
-    const res = await authApi.login(email, password);
+  function startSession(res: AuthResponse) {
     setToken(res.token);
     setUser(res.user);
     return res.user;
+  }
+
+  async function login(email: string, password: string) {
+    return startSession(await authApi.login(email, password));
+  }
+
+  // Entrar na demo repõe os dados padrão (o que outros visitantes criaram é apagado).
+  async function startDemo() {
+    return startSession(await authApi.startDemo());
   }
 
   function logout() {
@@ -66,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     navigate('/login', { replace: true });
   }
 
-  return <AuthContext.Provider value={{ user, isLoading, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, isLoading, login, startDemo, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {

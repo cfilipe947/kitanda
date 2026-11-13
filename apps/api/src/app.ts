@@ -7,13 +7,17 @@ import { prisma } from './lib/prisma.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { categoriesRoutes } from './modules/categories/categories.routes.js';
+import { createDemoRoutes } from './modules/demo/demo.routes.js';
 import { productsRoutes } from './modules/products/products.routes.js';
 import { reportsRoutes } from './modules/reports/reports.routes.js';
 import { salesRoutes } from './modules/sales/sales.routes.js';
 import { usersRoutes } from './modules/users/users.routes.js';
 import { generateOpenApiDocument } from './openapi.js';
 
-export function createApp() {
+// demoMode vem do DEMO_MODE por omissão; os testes passam-no explicitamente para
+// testarem as duas situações sem mexer em variáveis de ambiente.
+export function createApp(options: { demoMode?: boolean } = {}) {
+  const demoMode = options.demoMode ?? env.DEMO_MODE;
   const app = express();
 
   // Em produção (Render/Railway) a API fica atrás de um único proxy reverso: sem isto,
@@ -45,6 +49,9 @@ export function createApp() {
   v1.use('/products', productsRoutes);
   v1.use('/sales', salesRoutes);
   v1.use('/reports', reportsRoutes);
+  if (demoMode) {
+    v1.use('/demo', createDemoRoutes());
+  }
 
   app.use('/api/v1', v1);
 

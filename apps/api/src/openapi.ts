@@ -71,6 +71,15 @@ registry.registerPath({
 });
 
 registry.registerPath({
+  method: 'post',
+  path: '/api/v1/demo/start',
+  tags: ['Autenticação'],
+  summary:
+    'Repõe a loja de demonstração com os dados padrão e devolve um JWT do admin de demonstração. Só existe com DEMO_MODE=true (10 pedidos/minuto por IP)',
+  responses: { 200: { description: 'OK' }, ...errorResponses(404, 429) },
+});
+
+registry.registerPath({
   method: 'get',
   path: '/api/v1/auth/me',
   tags: ['Autenticação'],
