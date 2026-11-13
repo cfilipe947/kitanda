@@ -4,6 +4,7 @@
 
 ![CI](https://github.com/cfilipe947/kitanda/actions/workflows/ci.yml/badge.svg)
 
+**Demo:** https://kitanda-sand.vercel.app (botão "Experimentar a demo": cada entrada repõe os dados de exemplo)
 **Credenciais de demonstração:** `admin@kitanda.ao` / `admin123`
 
 ## O problema
