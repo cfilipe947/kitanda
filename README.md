@@ -4,7 +4,6 @@
 
 ![CI](https://github.com/cfilipe947/kitanda/actions/workflows/ci.yml/badge.svg)
 
-**Demo:** _(em breve — falta o deploy, ver `docs/DEPLOY.md`)_
 **Credenciais de demonstração:** `admin@kitanda.ao` / `admin123`
 
 ## O problema
@@ -13,9 +12,6 @@ Pequenas lojas e cantinas em Angola costumam controlar stock e vendas em caderno
 Isso faz perder vendas quando um produto acaba sem aviso, e ninguém sabe ao certo o que vende
 mais. O Kitanda resolve isto com um sistema simples: registar produtos, entradas de stock e
 vendas, e ver um painel com o que importa.
-
-Este é um projecto de portfólio feito para demonstrar competências técnicas — TypeScript, React,
-APIs REST, SQL, testes automatizados e segurança — numa candidatura a Desenvolvedor de Software.
 
 ## Funcionalidades
 
@@ -59,16 +55,6 @@ o utilizador ainda existe (um utilizador apagado perde o acesso de imediato, nã
 token expirar). O stock só muda por duas vias — `POST /products/:id/stock` (entradas/ajustes) e
 `POST /sales` (vendas) — nunca por um `PATCH` directo, para o histórico de `StockMovement` ser
 sempre a fonte de verdade de porque é que o stock mudou.
-
-## Capturas de ecrã
-
-| Login | Painel |
-|---|---|
-| ![Login](docs/screenshots/login.jpg) | ![Painel](docs/screenshots/dashboard.jpg) |
-
-| Produtos |
-|---|
-| ![Produtos](docs/screenshots/products.jpg) |
 
 ## Como correr localmente
 
@@ -131,24 +117,6 @@ apps/api   backend (REST)
 apps/web   frontend (React)
 docs/      especificação, roteiro e guia de deploy
 ```
-
-## O que aprendi
-
-Comparado com as decisões óbvias/por omissão, há três que valeram mesmo a pena explicar numa
-entrevista:
-
-1. **Prisma 7 mudou a forma como se liga à base de dados** — passou a usar *driver adapters*
-   (`@prisma/adapter-pg`) em vez do engine Rust embutido das versões anteriores. Isso significa
-   que `new PrismaClient()` sem um adapter dá erro, e a configuração vive num `prisma.config.ts`
-   (o `.env` deixou de ser carregado automaticamente pelo CLI).
-2. **Paralelismo de testes exige isolamento de dados.** O Vitest corre cada ficheiro de teste
-   num worker diferente por omissão; como todos apontam para a mesma base de dados de teste, um
-   worker a fazer `TRUNCATE` apanhava outro a meio de um pedido, dando falhas aleatórias. Testes
-   "flaky" nem sempre são bugs no código — às vezes são bugs na estratégia de teste.
-3. **Nem tudo o que o ORM não faz precisa de virar complexidade.** O Prisma não compara duas
-   colunas da mesma linha num `where` (ex.: `stockQuantity <= minStock`). Em vez de simular isso
-   trazendo todas as linhas para JavaScript, uma única query SQL parametrizada resolve — e ainda
-   dá para mostrar que sei escrever SQL quando é preciso.
 
 ---
 Feito por **Cesénio Filipe**: [LinkedIn](https://linkedin.com/in/cesénio-filipe-003b78319)
