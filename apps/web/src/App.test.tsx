@@ -92,6 +92,7 @@ describe('landing page', () => {
     expect(githubLink).toHaveAttribute('href', 'https://github.com/cfilipe947/kitanda');
 
     expect(screen.getByRole('link', { name: 'Entrar' })).toHaveAttribute('href', '/login');
+    expect(screen.getByRole('link', { name: 'Cesénio Filipe' })).toHaveAttribute('href', 'https://cesenio.is-a.dev');
   });
 
   it('o botão "Experimentar a demo" repõe a loja de demonstração e abre o Painel', async () => {

@@ -20,6 +20,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { DashboardPreview } from './DashboardPreview';
 
 const GITHUB_URL = 'https://github.com/cfilipe947/kitanda';
+const PORTFOLIO_URL = 'https://cesenio.is-a.dev';
 const LINKEDIN_URL = 'https://linkedin.com/in/cesénio-filipe-003b78319';
 const EMAIL = 'wagnerfilipe997@gmail.com';
 
@@ -296,7 +297,18 @@ function CtaFooter({ onDemo, isDemoLoading }: { onDemo: () => void; isDemoLoadin
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 text-center lg:flex-row lg:justify-between lg:px-8 lg:text-left">
           <div>
             <p className="font-heading text-lg font-semibold text-green-800">Kitanda</p>
-            <p className="mt-1 text-sm text-neutral-500">Feito por Cesénio Filipe.</p>
+            <p className="mt-1 text-sm text-neutral-500">
+              Feito por{' '}
+              <a
+                href={PORTFOLIO_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-green-700 underline-offset-2 hover:underline"
+              >
+                Cesénio Filipe
+              </a>
+              .
+            </p>
           </div>
           <div className="flex items-center gap-4 text-neutral-500">
             <a

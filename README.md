@@ -121,4 +121,4 @@ docs/      especificação, roteiro e guia de deploy
 ```
 
 ---
-Feito por **Cesénio Filipe**: [LinkedIn](https://linkedin.com/in/cesénio-filipe-003b78319)
+Feito por **[Cesénio Filipe](https://cesenio.is-a.dev)**: [Portfólio](https://cesenio.is-a.dev) · [LinkedIn](https://linkedin.com/in/cesénio-filipe-003b78319)
