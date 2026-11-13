@@ -2,8 +2,13 @@
 // Fase 1: configurar com Prisma 7 (prisma.config.ts + @prisma/adapter-pg) e correr a primeira migração.
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  // Explícito de propósito: no Docker o "prisma generate" corre (no postinstall) antes de o
+  // tsconfig.json existir na imagem, e sem ele o Prisma gera imports com ".ts", que o Node
+  // não encontra depois no dist/. Assim o resultado é igual em qualquer máquina.
+  moduleFormat        = "esm"
+  importFileExtension = "js"
 }
 
 datasource db {
